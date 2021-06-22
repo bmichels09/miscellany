@@ -1,0 +1,81 @@
+body {
+    font-family: sans-serif
+}
+
+.state {
+    fill: none;
+    stroke: #a9a9a9;
+    stroke-width: 1;
+}
+
+.state:hover {
+    fill-opacity: 0.5;
+}
+
+#pageHdr {
+    text-align: center;
+    width: 1320px;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+small {
+    font-weight: normal;
+}
+
+#tooltip {   
+    position: absolute;
+    text-align: center;
+    margin: 10px;
+    pointer-events: none;
+    background: rgba(24,24,48,1);
+    border: 1px solid grey;
+    border-radius: 5px;
+    font: 12px sans-serif;
+    width: auto;
+    padding: 4px;
+    color: white;
+    opacity: 0;
+}
+
+#map {
+    width: 1320px;
+    height: 600px;
+    display: flex;
+}
+
+#legend {
+    border: 1px solid grey;
+    width: 360px;
+    height: 6.15em;
+    margin-top: 75px;
+}
+
+.legendRow {
+    width: 960px;
+    height: 1.5em;
+    display: flex;
+}
+
+.square {
+    border: 1px solid #a9a9a9;
+    height: 1em;
+    width: 1em;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    display: flex;
+}
+
+.description {
+    height: 1em;
+    vertical-align: center;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    font-weight: normal;
+    display: flex;
+    flex-grow: 1;
+}

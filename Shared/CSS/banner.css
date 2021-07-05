@@ -1,0 +1,36 @@
+body {
+    margin: 0px;
+}
+
+#bannerInner {
+    height: 50px;
+    background-color: #201060;
+    display: flex;
+}
+
+#homeButton {
+    width: auto;
+    margin-left: 25px;
+    margin-right: 25px;
+    background-color: transparent;
+    border: none;
+    font: 16px sans-serif;
+    color: white;
+    cursor: pointer;
+}
+
+#menuButton {
+    width: auto;
+    background-color: transparent;
+    border: none;
+    font: 16px sans-serif;
+    color: white;
+    cursor: pointer;
+}
+
+#pageMenu {
+    background-color: #00ccff;
+    font: 16px sans-serif;
+    color: white;
+    opacity: 0;
+}

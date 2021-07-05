@@ -52,20 +52,19 @@ states = [
     {name: "District of Columbia", abbr: "DC", population: 689545}
 ]
 
-function getDeathCount(element) {
+function getDeathCount(dataSeries) {
     let currentTimestamp = Date.parse(new Date());
-    let dateStr = element.match('categories: \\[\\"([^}]*)\\"\\]\\s*\\}')[1];
-    let deathStr = element.match('data: \\[([^}]*)\\]\\s*\\},')[1];
-    let dates = dateStr.split('","').map(x => Date.parse(x));
-    let deathData = deathStr.split(',').map(x => parseInt(x));
-    if (dates[-1] - parseInt(86400000) < currentTimestamp){
-        dates.pop();
-        deathData.pop();
-    }
-    let deaths = parseInt(0);
-    for (j = deathData.length - 14; j < deathData.length; j++){
-        deaths = deaths + parseInt(deathData[j]);
-    }
+    let filterTimestamp = currentTimestamp - (15 * 86400000);
+    let deaths = 0;
+    dataSeries.forEach(data => {
+        let dayTimestamp = Date.parse(data.date);
+        if (dayTimestamp > filterTimestamp) {
+            let dailyDeaths = data.newDeaths;
+            if (dailyDeaths != null) {
+                deaths = deaths + dailyDeaths;
+            }
+        }
+    })
     return deaths;
 }
 
@@ -82,7 +81,7 @@ function getTooltip(stateName, deaths, ddpm) {
 }
 
 function setColorAndTooltip(stateAbbr, color, tooltip) {
-    function mouseOver(d){
+    function mouseOver(){
         d3.select("#tooltip").transition().duration(200).style("opacity", 1);
         
         d3.select("#tooltip").html(tooltip)
@@ -104,24 +103,17 @@ function fillMap() {
     let errors = [];
     states.forEach(state => {
         let stateName = state.name;
-        let stateLower = stateName.replace(" ","-").toLowerCase();
         let stateAbbr = state.abbr;
         let statePop = state.population;
-        let url = `https://www.worldometers.info/coronavirus/usa/${stateLower}`;
+        let url = `https://api.covidactnow.org/v2/state/${stateAbbr}.timeseries.json?apiKey=${apiKey}`;
         axios.get(url)
             .then(response => {
-                let html = new DOMParser().parseFromString(response.data, 'text/html').body;
-                let scripts = html.getElementsByTagName("script");
-                for (i = 0; i < scripts.length; i++) {
-                    let script = scripts[i].innerText;
-                    if (script.search("graph-deaths-daily") !== -1) {
-                        let deaths = getDeathCount(script);
-                        let ddpm = parseFloat(1000000) * deaths / 14 / statePop;
-                        let color = getColor(ddpm);
-                        let tooltip = getTooltip(stateName, deaths, ddpm);
-                        setColorAndTooltip(stateAbbr, color, tooltip)
-                    }
-                }
+                let days = response.data.actualsTimeseries
+                let deaths = getDeathCount(days);
+                let ddpm = parseFloat(1000000) * deaths / 14 / statePop;
+                let color = getColor(ddpm);
+                let tooltip = getTooltip(stateName, deaths, ddpm);
+                setColorAndTooltip(stateAbbr, color, tooltip);
             })
             .catch(error => {
                 console.log(error);

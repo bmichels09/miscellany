@@ -1,5 +1,7 @@
 body {
-    font-family: sans-serif
+    margin: 0px;
+    font: 16px sans-serif;
+    background-color: #ced0d4;
 }
 
 .state {
@@ -13,10 +15,18 @@ body {
 }
 
 #pageHdr {
-    text-align: center;
     width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+    /* border-radius: 25px; */
+    padding-top: 10px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: white;
     font-size: 2em;
     font-weight: bold;
+    text-align: center;
 }
 
 small {
@@ -41,7 +51,13 @@ small {
 #map {
     width: 1320px;
     height: 600px;
+    /* margin-top: 25px; */
+    margin-left: auto;
+    margin-right: auto;
+    /* border-radius: 25px; */
+    padding: 5px;
     display: flex;
+    background-color: white;
 }
 
 #legend {
@@ -78,4 +94,16 @@ small {
     font-weight: normal;
     display: flex;
     flex-grow: 1;
+}
+
+#notes {
+    width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+    /* border-radius: 25px; */
+    padding-top: 50px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: white;
 }

@@ -5,24 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COVID-19 Status Dashboard</title>
+	<link rel="stylesheet" href="Shared/CSS/banner.css"></link>
 	<link rel="stylesheet" href="COVIDStatus/CSS/style.css"></link>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-	<!-- Div for tooltip -->
+	<div id="banner"></div>
 	<div id="tooltip"></div>
-
-	<!-- Div for page header -->
 	<div id="pageHdr">COVID-19 Status Dashboard<br><small>Recent Deaths by State</small></div>
-
-	<!-- Div to hold map -->
 	<div id="map">
 		<svg width="960" height="600" id="statesvg"></svg>
-
-	<!-- Div for legend -->
-		<div width="960" height="600" id="legend">
+		<div id="legend">
 			<div class="legendRow" id="rowGood">
 				<div class="square" id="squareGood" style="background-color: rgb(0, 168, 84);"></div>
 				<div class="description" id="descGood">&lt; 0.3 daily deaths per million residents</div>
@@ -41,13 +36,11 @@
 			</div>
 		</div>
 	</div>
-
-	<!-- Div for notes -->
-	<div width="960" height="600" id="notes">
+	<div id="notes">
 		Notes placeholder
 	</div>
-
-	<!-- Scripts that edit HTML elements -->
+	<script src="Shared/Scripts/banner.js"></script>
+	<script src="COVIDStatus/Scripts/config.js"></script>
 	<script src="COVIDStatus/Scripts/getData.js"></script>
 	<script src="Shared/Scripts/uStates2.js"></script>
 </body>

@@ -2,13 +2,13 @@ body {
     margin: 0px;
 }
 
-#bannerInner {
+#navbar {
     height: 50px;
-    background-color: #201060;
+    background-color: #252525;
     display: flex;
 }
 
-#homeButton {
+.linkButton, .menuButton {
     width: auto;
     margin-left: 25px;
     margin-right: 25px;
@@ -19,18 +19,20 @@ body {
     cursor: pointer;
 }
 
-#menuButton {
+.menuLinkButton {
     width: auto;
     background-color: transparent;
     border: none;
     font: 16px sans-serif;
     color: white;
     cursor: pointer;
+    display: block;
+    padding-top: 6px;
+    padding-bottom: 6px;
 }
 
-#pageMenu {
-    background-color: #00ccff;
+.openMenu {
+    background-color: #404040;
     font: 16px sans-serif;
     color: white;
-    opacity: 0;
 }

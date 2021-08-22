@@ -4,41 +4,64 @@
 	<meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COVID-19 Status Dashboard</title>
-	<link rel="stylesheet" href="Shared/CSS/banner.css"></link>
+    <title>COVID-19 Dashboard</title>
+	<link rel="stylesheet" href="Shared/CSS/navbar.css"></link>
 	<link rel="stylesheet" href="COVIDStatus/CSS/style.css"></link>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-	<div id="banner"></div>
-	<script src="Shared/Scripts/banner.js"></script>
+	<div id="navbar"></div>
+	<script src="Shared/Scripts/navbar.js"></script>
 	<div id="tooltip"></div>
-	<div id="pageHdr">COVID-19 Status Dashboard<br><small>Recent Deaths by State</small></div>
-	<div id="map">
-		<svg width="960" height="600" id="statesvg"></svg>
-		<div id="legend">
-			<div class="legendRow" id="rowGood">
-				<div class="square" id="squareGood" style="background-color: rgb(0, 168, 84);"></div>
-				<div class="description" id="descGood">&lt; 0.3 daily deaths per million residents</div>
-			</div>
-			<div class="legendRow" id="rowDecent">
-				<div class="square" id="squareDecent" style="background-color: rgb(144, 224, 96);"></div>
-				<div class="description" id="descDecent">0.3 - 0.6 daily deaths per million residents</div>
-			</div>
-			<div class="legendRow" id="rowAverage">
-				<div class="square" id="squareAverage" style="background-color: rgb(255, 224, 96);"></div>
-				<div class="description" id="descAverage">0.6 - 0.9 daily deaths per million residents</div>
-			</div>
-			<div class="legendRow" id="rowBad">
-				<div class="square" id="squareBad" style="background-color: rgb(224, 64, 64);"></div>
-				<div class="description" id="descBad">&gt; 0.9 daily deaths per million residents</div>
+	<div id="container">
+		<div id="pageHdr">COVID-19 Dashboard</div>
+		<div class="dashHdr" id="roadHdr">Road to 36,000</div>
+		<div class="dashDesc" id="roadDesc">
+			<p>
+				The CDC estimates that in the 10 flu seasons preceding the emergence of COVID-19,
+				<a href="https://www.cdc.gov/flu/about/burden/index.html">influenza killed 36,000 Americans per year</a>,
+				making it the deadliest contagious disease in the US.  Since we use vaccines to keep that number from being
+				higher, we can consider 36,000 as the highest number of annual deaths from a contagious disease that's
+				socially acceptable.  Therefore, to go back to "normal", we need to get annual COVID-19 deaths under 36,000
+				(or at least close to 36,000).
+			</p>
+			<p>
+				This map tracks each state's progress toward that goal, using data from the last 14 days.  36,000
+				deaths in one year is equivalent to roughly 100 deaths per day, which is equivalent to roughly 0.3 daily
+				deaths for every million Americans.  States below that threshold are colored
+				<span style="color: rgb(0, 168, 84); font-weight: bold;">green</span> and do not need to take measures
+				to lower the number of COVID-19 deaths.
+			</p>
+		</div>
+		<div id="map">
+			<svg width="960" height="600" id="statesvg"></svg>
+			<div id="legend">
+				<div class="legendRow" id="rowGood">
+					<div class="square" id="squareGood" style="background-color: rgb(0, 168, 84);"></div>
+					<div class="description" id="descGood">&lt; 0.3 daily deaths per million residents</div>
+				</div>
+				<div class="legendRow" id="rowDecent">
+					<div class="square" id="squareDecent" style="background-color: rgb(144, 224, 96);"></div>
+					<div class="description" id="descDecent">0.3 - 0.6 daily deaths per million residents</div>
+				</div>
+				<div class="legendRow" id="rowAverage">
+					<div class="square" id="squareAverage" style="background-color: rgb(255, 224, 96);"></div>
+					<div class="description" id="descAverage">0.6 - 0.9 daily deaths per million residents</div>
+				</div>
+				<div class="legendRow" id="rowBad">
+					<div class="square" id="squareBad" style="background-color: rgb(224, 64, 64);"></div>
+					<div class="description" id="descBad">&gt; 0.9 daily deaths per million residents</div>
+				</div>
 			</div>
 		</div>
-	</div>
-	<div id="notes">
-		Notes placeholder
+		<div class="dashSrc" id="roadSrc">
+			<p>
+				<b>Source:</b> New York Times, retrieved through the
+				<a href="https://covidactnow.org/data-api">Covid Act Now API</a>
+			</p>
+		</div>
 	</div>
 	<script src="COVIDStatus/Scripts/config.js"></script>
 	<script src="COVIDStatus/Scripts/getData.js"></script>

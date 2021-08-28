@@ -114,6 +114,7 @@ if (qsParams.has("navbar"))
     // Select the navbar div and style it
     var navbar = d3.select("#navbar");
     navbar
+        .style("height", "50px")
         .style("box-shadow", "0 4px 2px -2px rgba(0, 0, 0, 0.3)")
         .style("position", "relative")
         .style("z-index", "1");

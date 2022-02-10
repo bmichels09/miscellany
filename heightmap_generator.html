@@ -8,11 +8,57 @@
 	<link rel="stylesheet" href="Shared/CSS/navbar.css"></link>
 	<link rel="stylesheet" href="HeightmapGenerator/CSS/style.css"></link>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="Shared/Scripts/UPNG.js"></script>
+	<script src="Shared/Scripts/UZIP.js"></script>
+	<script src="Shared/Scripts/pako.js"></script>
+	<script src="HeightmapGenerator/Scripts/directionDefs.js"></script>
+	<script src="HeightmapGenerator/Scripts/createPixels.js"></script>
+	<script src="HeightmapGenerator/Scripts/erode.js"></script>
+	<script src="HeightmapGenerator/Scripts/landforms.js"></script>
+	<script src="HeightmapGenerator/Scripts/smooth.js"></script>
+	<script src="HeightmapGenerator/Scripts/makeFile.js"></script>
+	<script src="HeightmapGenerator/Scripts/generate.js"></script>
 </head>
 <body>
 	<div id="navbar"></div>
 	<script src="Shared/Scripts/navbar.js"></script>
 	<div id="generator">
-
+		<div id="pageHdr">Cities: Skylines Heightmap Generator</div>
+		<div class="container" id="contTemp">
+			<label for="selTemp">Template:</label>
+			<select id="selTemp">
+				<option value="inlandWE">Inland (West to East Slope)</option>
+			</select>
+		</div>
+		<div class="container" id="contMaj">
+			<label for="numMaj">Major hills:</label>
+			<input type="number" id="numMaj" step="1" min="1" max="200" value="100" required />
+		</div>
+		<div class="container" id="contMin">
+			<label for="numMin">Minor hills:</label>
+			<input type="number" id="numMin" step="1" min="1" max="400" value="200" required />
+		</div>
+		<div class="container" id="contHeight">
+			<label for="numHeight">Max height:</label>
+			<input type="number" id="numHeight" step="1" min="100" max="1024" value="1020" required />
+		</div>
+		<div class="container" id="contSlope">
+			<label for="numSlope">Base slope:</label>
+			<input type="number" id="numSlope" step="0.01" min="1" max="8" value="4" required />
+		</div>
+		<div class="container" id="contSmooth">
+			<label for="numSmooth">Smoothing cycles:</label>
+			<input type="number" id="numSmooth" step="1" min="1" max="20" value="1" required />
+		</div>
+		<div class="container" id="contErosion">
+			<label for="numErosion">Erosion cycles:</label>
+			<input type="number" id="numErosion" step="1" min="1" max="20" value="1" required />
+		</div>
+		<div class="container" id="contGenerate">
+			<input type="button" id="createButton" value="Generate map" onclick="generate()" />
+		</div>
+		<div class="container" id="contStatus">
+			<span id="status"></span>
+		</div>
     </div>
 </body>

@@ -155,6 +155,7 @@ function setColorAndTooltip(stateAbbr, color, tooltip) {
 function fillMap() {
     let adjustment = 1;
     let endTimestamp = getEndTimestamp();
+    var barArray = new Array();
     
     // If the date in the query string is before 1/1/2021, use populations for July 2020.
     // Otherwise, use populations for July 2021.
@@ -165,6 +166,96 @@ function fillMap() {
         adjustment = censusData.adj2021;
     }
 
+    // Create the bar graph
+    var historicalColor = "rgb(240, 160, 160)";
+    barArray.push({
+        name: "Influenza and Pneumonia (USA, 1918)",
+        ddpm: 12.342650511322792222754315530388,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Heart Disease (2019)",
+        ddpm: 5.4677339280293094054922490625971,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Cancer (2019)",
+        ddpm: 4.9745899435396309923700619994542,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Unintentional Injuries (2019)",
+        ddpm: 1.435626431293639848698910656229,
+        color: historicalColor
+    });
+    
+    barArray.push({
+        name: "Chronic Lower Respiratory Diseases (2019)",
+        ddpm: 1.3023763381764001953820289869635,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Stroke (2019)",
+        ddpm: 1.2445165443030654502085072410288,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Alzheimer's Disease (2019)",
+        ddpm: 1.0080165035584023808198621464469,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Diabetes (2019)",
+        ddpm: 0.72716337161115147838022088700012,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Kidney Disease (2019)",
+        ddpm: 0.42780904374512562874571964856939,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Influenza and Pneumonia (2019)",
+        ddpm: 0.41302468001092968439538759361447,
+        color: historicalColor
+    });
+
+    barArray.push({
+        name: "Suicide (2019)",
+        ddpm: 0.39417503107485045568385312175274,
+        color: historicalColor
+    });
+
+    var trace = {};
+    var layout = {
+        autosize: false,
+        showlegend: false,
+        width: 1320,
+        height: 1980,
+        font: {size: 14},
+        margin: {t: 25},
+        xaxis: {
+            automargin: true,
+            fixedrange: true
+        },
+        yaxis: {
+            automargin: true,
+            fixedrange: true,
+            showticklabels: false
+        }
+    };
+    
+    Plotly.newPlot("bar", [trace], layout, {staticPlot: true});
+
+    // Get data for each state
     states.forEach(state => {
         let stateName = state.name;
         let stateAbbr = state.abbr;
@@ -180,6 +271,22 @@ function fillMap() {
                 let color = getColor(ddpm);
                 let tooltip = getTooltip(stateName, deaths, ddpm, nullDays);
                 setColorAndTooltip(stateAbbr, color, tooltip);
+                barArray.push({name: stateName, ddpm: ddpm, color: "rgb(224, 64, 64)"});
+                barSorted = barArray.sort((a, b) => a.ddpm - b.ddpm);
+
+                trace = {
+                    x: barSorted.map(x => x.ddpm),
+                    y: barSorted.map(x => x.name),
+                    text: barSorted.map(x => `${x.name} - ${x.ddpm.toFixed(2)} `),
+                    textposition: 'auto',
+                    textfont: {size: 14},
+                    hoverinfo: 'none',
+                    type: "bar",
+                    orientation: "h",
+                    marker: {color: barSorted.map(x => x.color)}
+                };
+
+                Plotly.newPlot("bar", [trace], layout, {staticPlot: true});
             })
             .catch(error => {
                 console.log(error);
@@ -188,3 +295,15 @@ function fillMap() {
 }
 
 fillMap();
+
+/* let url = `https://api.covidactnow.org/v2/country/US.timeseries.json?apiKey=${apiKey}`;
+axios.get(url)
+    .then(response => {
+        let dataSeries = response.data.actualsTimeseries;
+        dataSeries.forEach(data => {
+            console.log(`${data.date},${data.cases},${data.deaths}`)
+        })
+    })
+    .catch(error => {
+        console.log(error);
+    }); */

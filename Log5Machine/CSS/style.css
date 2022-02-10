@@ -1,7 +1,7 @@
 body {
     margin: 0px;
     font: 16px "Segoe UI",sans-serif;
-    background-color: #ced0d4;
+    background-color: rgb(206, 208, 212);
 }
 
 #container {
@@ -10,6 +10,39 @@ body {
     margin-left: auto;
     margin-right: auto;
     background-color: white;
+}
+
+#buttonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#uploadButton {
+    width: 125px;
+    height: 33px;
+    font-size: 20px;
+}
+
+#result {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+table, tr, th, td {
+    text-align: center;
+    border: 1px solid rgb(185, 187, 191);
+    border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+    background-color: rgb(236, 237, 238);
+}
+
+th, td {
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .state {
@@ -108,10 +141,4 @@ small {
     font-weight: normal;
     display: flex;
     flex-grow: 1;
-}
-
-@media screen and (max-width: 1320px) {
-    #container {
-        width: 100%;
-    }
 }

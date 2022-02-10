@@ -37,7 +37,7 @@ body {
     padding-left: 25px;
     padding-right: 25px;
     font-size: 1.75em;
-    color: #ff8000;
+    color: rgb(0, 132, 84);
 }
 
 .dashDesc, .dashSrc {
@@ -108,10 +108,4 @@ small {
     font-weight: normal;
     display: flex;
     flex-grow: 1;
-}
-
-@media screen and (max-width: 1320px) {
-    #container {
-        width: 100%;
-    }
 }

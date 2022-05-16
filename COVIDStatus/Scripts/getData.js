@@ -100,8 +100,6 @@ function getEndTimestamp() {
     let dateParam = qsParams.get("date");
     let endDate = new Date();
 
-    console.log("dateParam = " + dateParam);
-
     // If the date parameter has a value, try to get a valid date from it
     if (dateParam !== undefined) {
         try {

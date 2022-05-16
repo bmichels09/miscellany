@@ -1,0 +1,20 @@
+body {
+    margin: 0px;
+    font: 16px "Segoe UI",sans-serif;
+    background-color: white;
+}
+
+table, tr, th, td {
+    text-align: center;
+    border: 1px solid rgb(185, 187, 191);
+    border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+    background-color: rgb(236, 237, 238);
+}
+
+th, td {
+    padding-left: 8px;
+    padding-right: 8px;
+}

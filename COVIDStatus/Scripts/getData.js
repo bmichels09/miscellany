@@ -258,7 +258,7 @@ function fillMap() {
         let stateName = state.name;
         let stateAbbr = state.abbr;
         let statePop = state.population;
-        let url = `https://api.covidactnow.org/v2/state/${stateAbbr}.timeseries.json?apiKey=${apiKey}`;
+        let url = `https://api.covidactnow.org/v2/state/${stateAbbr}.timeseries.json?apiKey=${covidKey}`;
         axios.get(url)
             .then(response => {
                 let dataSeries = response.data.actualsTimeseries;

@@ -110,8 +110,8 @@ small {
     flex-grow: 1;
 }
 
-@media screen and (max-width: 1320px) {
+/* @media screen and (max-width: 1320px) {
     #container {
         width: 100%;
     }
-}
+} */

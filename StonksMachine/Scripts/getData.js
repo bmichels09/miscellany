@@ -17,7 +17,6 @@ function setTooltip(spanId, text) {
 
 function drawTable(data) {
     var qsParams = new URLSearchParams(window.location.search);
-    console.log(data);
     var growthIndexHtml;
     var resultElement = d3.select("#result");
     resultElement.html("");
@@ -38,14 +37,10 @@ function drawTable(data) {
             return;
         }
     });
-    console.log(growth21DayTimestamps.reduce((a, b) => Math.max(a, b)));
     var correctDateObj = new Date(growth21DayTimestamps.reduce((a, b) => Math.max(a, b)));
-    console.log(correctDateObj);
     var correctDate = `${String(correctDateObj.getFullYear())}-${String(correctDateObj.getMonth() + 1).padStart(2, '0')}-${String(correctDateObj.getDate()).padStart(2, '0')}`
-    console.log(correctDate);
 
     data.forEach(x => {
-        let resultRow = resultTable.append("tr").attr("id", `resultDataRow_${x.ticker}`);
         let tooltip = `<h4>3 Day Growth:&nbsp;&nbsp;${Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2}).format(x.growth3Day)}`;
         tooltip = tooltip + `<br>21 Day Growth:&nbsp;&nbsp;${Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2}).format(x.growth21Day)}`;
         tooltip = tooltip + `<br>Vs. 21 Day Average:&nbsp;&nbsp;${Intl.NumberFormat('en-US', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2}).format(x.avg21Day)}</h4>`;
@@ -59,6 +54,7 @@ function drawTable(data) {
             growthIndexHtml = `${Intl.NumberFormat('en-US', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(x.marketIndIndex)}`;
         }
 
+        let resultRow = resultTable.append("tr").attr("id", `resultDataRow_${x.ticker}`);
         resultRow.append("td")
             .attr("id", `resultDataTicker_${x.ticker}`)
             .html(`<a href="https://www.google.com/search?q=${x.ticker.toLowerCase()}+stock" target="_blank">${x.ticker}</a>`);
@@ -184,7 +180,6 @@ function drawTable(data) {
 
     for (var i = 0; i < endData; i++) {
         resultElement.html(`Retrieving data for group ${i + 1} of ${endData}...`);
-        console.log(`Retrieving data for group ${i + 1} of ${endData}...`);
         var symbols = data[i];
         let timeoutEnd = (new Date()).getTime() + 12;
         do {} while ((new Date()).getTime() < timeoutEnd)
@@ -240,7 +235,6 @@ function drawTable(data) {
 
     for (var i = 0; i < batches.length; i++) {
         resultElement.html(`Calculating index for batch ${i + 1} of ${batches.length}...`);
-        console.log(`Calculating index for batch ${i + 1} of ${batches.length}...`);
         var symbols = batches[i].join(',');
         let timeoutEnd = (new Date()).getTime() + 12;
         do {} while ((new Date()).getTime() < timeoutEnd)

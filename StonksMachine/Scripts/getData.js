@@ -310,7 +310,7 @@ function drawTable(data) {
     });
 
     if (qsParams.has("debug")) {
-        console.log(error);
+        console.log(collectedData);
     }
 
     drawTable(collectedData);

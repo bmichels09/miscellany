@@ -309,5 +309,9 @@ function drawTable(data) {
         else {return 0;}
     });
 
+    if (qsParams.has("debug")) {
+        console.log(error);
+    }
+
     drawTable(collectedData);
 })();

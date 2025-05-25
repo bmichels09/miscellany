@@ -1,17 +1,17 @@
 function calculateOnce(data) {
     // Calculate new rating for each team
     data.forEach(team => {
-        let expectedWins = 0;
-        let expectedLosses = 0;
+        let expectedWins = parseFloat(0);
+        let expectedLosses = parseFloat(0);
 
         // Get expected wins and losses against each opponent using current ratings
         team.opponents.forEach(opponent => {
-            let oppTeam = data.filter(item => item.name === opponent.name)[0];
+            let oppTeam = data.filter(x => x.name === opponent.name)[0];
             let winAB = team.rating * (1 - oppTeam.rating);
             let winBA = oppTeam.rating * (1 - team.rating);
             let winProb = winAB / (winAB + winBA);
-            expectedWins = expectedWins + (winProb * (opponent.wins + opponent.losses));
-            expectedLosses = expectedLosses + ((1 - winProb) * (opponent.wins + opponent.losses));
+            expectedWins = expectedWins + (winProb * (opponent.wins + opponent.losses + opponent.ties));
+            expectedLosses = expectedLosses + ((1 - winProb) * (opponent.wins + opponent.losses + opponent.ties));
         });
         
         // Calculate overall expected winning percentage
@@ -22,7 +22,7 @@ function calculateOnce(data) {
         team.sos = (1 - expWinPct) / (1 - (2 * expWinPct) + (expWinPct / team.rating));
 
         // Get updated team rating using the actual winning percentage and the strength of schedule rating
-        team.newRtg = (team.sos * team.winPct) / (1 - team.sos - team.winPct + (2 * team.sos * team.winPct));
+        team.newRtg = (team.sos * team.adjWinPct) / (1 - team.sos - team.adjWinPct + (2 * team.sos * team.adjWinPct));
     });
 
     // Replace each team rating with the updated rating
@@ -30,140 +30,300 @@ function calculateOnce(data) {
     return data;
 }
 
-function processData(rawData) {
+function processData(rawData, numCycles, nullGames, useNullOpp) {
     console.log(rawData);
+    
     // ROW AND COLUMN VALIDITY CHECKS
-    // Row 1, Cell 1 is not blank
-    if (rawData.columns[0].length === 0) {
-        let html = "<b>Invalid file:</b> Row 1, cell 1 cannot be blank";
+    // Data has 3 columns
+    if (rawData.columns.length !== 3) {
+        let html = "<b>Invalid file:</b> File must 3 columns - Winner, Loser, and Tie";
         d3.select("#result").html(html);
         return;
     }
-    // Equal number of rows and columns
-    if (rawData.length !== rawData.columns.length - 1) {
-        let html = `<b>Invalid file:</b> The number of rows must equal the number of columns.
-                    The file you uploaded has ${rawData.length + 1} rows and ${rawData.columns.length} columns.`;
+
+    // Correct column labels
+    if (rawData.columns[0] !== "Winner" || rawData.columns[1] !== "Loser" || rawData.columns[2] !== "Tie") {
+        let html = `<b>Invalid file:</b> The column labels must be Winner, Loser, and Tie`;
         d3.select("#result").html(html);
         return;
     }
-    // Row labels match the column labels
+
+    // Each row must have a winner and a loser
     for (let i = 0; i < rawData.length; i++) {
-        if (rawData[i][rawData.columns[0]] !== rawData.columns[i + 1]) {
-            let html = `<b>Invalid file:</b> The label for each row must match the label for its corresponding column.
-                        Row number ${i + 2} (${rawData[i][rawData.columns[0]]}) and column number ${i + 2}
-                        (${rawData.columns[i + 1]}) do not match.`;
+        if (rawData[i].Winner === "" || rawData[i].Loser === "") {
+            let html = `<b>Invalid file:</b> Each row must have a winner and a loser`;
             d3.select("#result").html(html);
             return;
         }
-    }
-
-    // No duplicate rows or columns
-    // https://stackoverflow.com/questions/49215358/checking-for-duplicate-strings-in-javascript-array
-    let duplicates = rawData.columns.filter((item, index) => rawData.columns.indexOf(item) !== index);
-    if (duplicates.length > 0) {
-        let html = `<b>Invalid file:</b> Rows cannot have duplicate labels.
-                    The following rows appear more than once:<br>`
-        duplicates.forEach(item => html = html + `<br>${item}`);
-        d3.select("#result").html(html);
-        return;
     }
 
     // PUT DATA INTO MORE USABLE FORMAT
     let data = [];
 
-    // For each team, create an array item with its name and a blank list of opponents
-    rawData.forEach(row => {
+    // If using the null opponent model, create the null team
+    if(useNullOpp && nullGames > 0) {
         data.push({
-            name: row[rawData.columns[0]],
-            rating: 0,
-            wins: 0,
-            losses: 0,
-            winPct: 0,
-            sos: 0,
-            newRtg: 0,
+            name: "Null",
+            rating: parseFloat(0),
+            wins: parseFloat(0),
+            losses: parseFloat(0),
+            ties: parseFloat(0),
+            winPct: parseFloat(0),
+            adjWinPct: parseFloat(0),
+            sos: parseFloat(0),
+            newRtg: parseFloat(0),
             opponents: []
         });
+    }
+
+    // Incorporate the winner and loser from each row into the data array
+    rawData.forEach(row => {
         
-        // Add in the opponents, along with wins and losses against the opponent
-        rawData.columns.filter(item => item !== rawData.columns[0]).forEach(column => {
-            data.filter(item => item.name === row[rawData.columns[0]])[0].opponents.push({
-                name: column,
-                wins: Number(row[column]),
-                losses: Number(rawData.filter(item => item[rawData.columns[0]] === column)[0][row[rawData.columns[0]]])
+        // Check if the winner already has an entry in the array, and if so, use that
+        let winnerIdx = data.findIndex(x => x.name === row.Winner);
+        if(winnerIdx !== -1) {
+            
+            // Check if the loser is in the list of the winner's opponents, and if so, use that
+            let loserIdx = data[winnerIdx].opponents.findIndex(x => x.name === row.Loser);
+            if(loserIdx !== -1) {
+                
+                // Add win or tie to that matchup
+                if (row.Tie === "") {
+                    data[winnerIdx].opponents[loserIdx].wins += 1;
+                }
+                else {
+                    data[winnerIdx].opponents[loserIdx].ties += 1;
+                }
+            }
+
+            else {
+                // Create the matchup
+                if (row.Tie === "") {
+                    data[winnerIdx].opponents.push({
+                        name: row.Loser,
+                        wins: parseFloat(1),
+                        losses: parseFloat(0),
+                        ties: parseFloat(0)
+                    });
+                }
+                else {
+                    data[winnerIdx].opponents.push({
+                        name: row.Loser,
+                        wins: parseFloat(0),
+                        losses: parseFloat(0),
+                        ties: parseFloat(1)
+                    });
+                }
+            }
+        }
+
+        // If the winner doesn't have an entry in the data array, create it
+        else {
+            let opponents = [];
+            
+            if (useNullOpp && nullGames > 0) {
+                opponents.push({
+                    name: "Null",
+                    wins: parseFloat(0),
+                    losses: parseFloat(0),
+                    ties: parseFloat(nullGames)
+                });
+
+                data[0].opponents.push({
+                    name: row.Winner,
+                    wins: parseFloat(0),
+                    losses: parseFloat(0),
+                    ties: parseFloat(nullGames)
+                });
+            }
+            
+            if (row.Tie === "") {
+                opponents.push({
+                    name: row.Loser,
+                    wins: parseFloat(1),
+                    losses: parseFloat(0),
+                    ties: parseFloat(0)
+                });
+            }
+
+            else {
+                opponents.push({
+                    name: row.Loser,
+                    wins: parseFloat(0),
+                    losses: parseFloat(0),
+                    ties: parseFloat(1)
+                });
+            }
+            
+            data.push({
+                name: row.Winner,
+                rating: parseFloat(0),
+                wins: parseFloat(0),
+                losses: parseFloat(0),
+                ties: parseFloat(0),
+                winPct: parseFloat(0),
+                adjWinPct: parseFloat(0),
+                sos: parseFloat(0),
+                newRtg: parseFloat(0),
+                opponents: opponents
             });
-        });
+        }
+        
+        // Do the same thing but for the loser
+        loserIdx = data.findIndex(x => x.name === row.Loser);
+        if(loserIdx !== -1) {
+            winnerIdx = data[loserIdx].opponents.findIndex(x => x.name === row.Winner);
+            if(winnerIdx !== -1) {
+                if (row.Tie === "") {
+                    data[loserIdx].opponents[winnerIdx].losses += 1;
+                }
+                else {
+                    data[loserIdx].opponents[winnerIdx].ties += 1;
+                }
+            }
+
+            else {
+                if (row.Tie === "") {
+                    data[loserIdx].opponents.push({
+                        name: row.Winner,
+                        wins: parseFloat(0),
+                        losses: parseFloat(1),
+                        ties: parseFloat(0)
+                    });
+                }
+                else {
+                    data[loserIdx].opponents.push({
+                        name: row.Winner,
+                        wins: parseFloat(0),
+                        losses: parseFloat(0),
+                        ties: parseFloat(1)
+                    });
+                }
+            }
+        }
+
+        else {
+            let opponents = [];
+            
+            if (useNullOpp && nullGames > 0) {
+                opponents.push({
+                    name: "Null",
+                    wins: parseFloat(0),
+                    losses: parseFloat(0),
+                    ties: parseFloat(nullGames)
+                });
+
+                data[0].opponents.push({
+                    name: row.Loser,
+                    wins: parseFloat(0),
+                    losses: parseFloat(0),
+                    ties: parseFloat(nullGames)
+                });
+            }
+            
+            if (row.Tie === "") {
+                opponents.push({
+                    name: row.Winner,
+                    wins: parseFloat(0),
+                    losses: parseFloat(1),
+                    ties: parseFloat(0)
+                });
+            }
+
+            else {
+                opponents.push({
+                    name: row.Winner,
+                    wins: parseFloat(0),
+                    losses: parseFloat(0),
+                    ties: parseFloat(1)
+                });
+            }
+            
+            data.push({
+                name: row.Loser,
+                rating: parseFloat(0),
+                wins: parseFloat(0),
+                losses: parseFloat(0),
+                ties: parseFloat(0),
+                winPct: parseFloat(0),
+                adjWinPct: parseFloat(0),
+                sos: parseFloat(0),
+                newRtg: parseFloat(0),
+                opponents: opponents
+            });
+        }
     });
 
     // Calculate wins and losses for each team
     data.forEach(team => {
-        team.opponents.forEach(opponent => {
-            // If matchup has a negative number of wins, throw an error
-            if (opponent.wins < 0) {
-                let html = `<b>Invalid file:</b> No matchup can have a negative number of wins.
-                    ${team.name} has ${opponent.wins} against ${opponent.name}.`
-                d3.select("#result").html(html);
-                return;
-            }
-
-            if (opponent.losses < 0) {
-                let html = `<b>Invalid file:</b> No matchup can have a negative number of wins.
-                    ${opponent.name} has ${opponent.losses} against ${team.name}.`
-                d3.select("#result").html(html);
-                return;
-            }
-            
-            // If team has wins against itself, throw an error
-            if ((opponent.name === team.name) && (opponent.wins + opponent.losses !== 0)) {
-                let html = `<b>Invalid file:</b> No competitor can have a win against itself.
-                    ${opponent.name} currently has ${opponent.wins} wins against itself.`
-                d3.select("#result").html(html);
-                return;
-            }
-            
-            // Add wins and losses against this opponent to the team's wins and losses
-            team.wins = team.wins + opponent.wins;
-            team.losses = team.losses + opponent.losses;
-        });
+        let adjWins = 0;
+        let adjLosses = 0;
         
+        if(useNullOpp) {
+            team.wins = team.opponents.filter(x => x.name !== "Null").map(x => x.wins).reduce((a, b) => a + b, parseFloat(0));
+            team.losses = team.opponents.filter(x => x.name !== "Null").map(x => x.losses).reduce((a, b) => a + b, parseFloat(0));
+            team.ties = team.opponents.filter(x => x.name !== "Null").map(x => x.ties).reduce((a, b) => a + b, parseFloat(0));
+            adjWins = team.opponents.map(x => x.wins).reduce((a, b) => a + b, parseFloat(0));
+            adjWins = adjWins + (team.opponents.map(x => x.ties).reduce((a, b) => a + b, parseFloat(0))) * 0.5;
+            adjLosses = team.opponents.map(x => x.losses).reduce((a, b) => a + b, parseFloat(0));
+            adjLosses = adjLosses + (team.opponents.map(x => x.ties).reduce((a, b) => a + b, parseFloat(0))) * 0.5;
+        }
+
+        else {
+            team.wins = team.opponents.map(x => x.wins).reduce((a, b) => a + b, parseFloat(0));
+            team.losses = team.opponents.map(x => x.losses).reduce((a, b) => a + b, parseFloat(0));
+            team.ties = team.opponents.map(x => x.ties).reduce((a, b) => a + b, parseFloat(0));
+            adjWins = team.wins + team.ties * 0.5 + parseFloat(nullGames) * 0.5;
+            adjLosses = team.losses + team.ties * 0.5 + parseFloat(nullGames) * 0.5;
+        }
+
         // If team has zero total wins or zero total losses, throw an error (this is technically a valid configuration,
         // the log5 model just doesn't handle these cases well)
-        if (team.wins === 0) {
-            let html = `<b>Invalid file:</b> Each competitor must have more than zero total wins and zero total losses.
-                ${team.name} currently has zero total wins.`
+        if (adjWins === 0) {
+            let html = `<b>Invalid file:</b> Each competitor must have more than zero total wins and zero total losses,
+                after null games are added in. ${team.name} currently has zero total wins.`
             d3.select("#result").html(html);
             return;
         }
 
-        if (team.losses === 0) {
+        if (adjLosses === 0) {
             let html = `<b>Invalid file:</b> Each competitor must have more than zero total wins and zero total losses.
-                ${team.name} currently has zero total losses.`
+                after null games are added in. ${team.name} currently has zero total losses.`
             d3.select("#result").html(html);
             return;
         }
-        
+
         // Calculate winning percentage and use it as a default rating
-        team.winPct = parseFloat(team.wins) / (parseFloat(team.wins) + parseFloat(team.losses));
-        team.rating = team.winPct;
+        team.winPct = (team.wins + team.ties * 0.5) / (team.wins + team.losses + team.ties);
+        team.adjWinPct = adjWins / (adjWins + adjLosses);
+        team.rating = team.adjWinPct;
     });
 
     console.log(data);
 
     // Do rating calculation an arbitrarily large number of times
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < numCycles; i++) {
         data = calculateOnce(data);
         console.log(data);
     }
 
+    // Sort by rating
+    data.sort((a, b) => b.rating - a.rating);
+    
+    // Write column headers
     let html = `<table>
                     <tr>
-                        <th>${rawData.columns[0]}</th>
+                        <th>Name</th>
                         <th>Rating</th>
                         <th>Wins</th>
                         <th>Losses</th>
-                        <th>Pct</th>
+                        <th>Ties</th>
+                        <th>Win Pct</th>
+                        <th>Adj Win Pct</th>
                         <th>SOS</th>
                     </tr>`;
 
+    // Write each row of data
     data.forEach(team => {
         html = `${html}
                 <tr>
@@ -171,7 +331,9 @@ function processData(rawData) {
                     <td>${team.rating.toFixed(3)}</td>
                     <td>${Math.round(team.wins * 1000) / parseFloat(1000)}</td>
                     <td>${Math.round(team.losses * 1000) / parseFloat(1000)}</td>
+                    <td>${Math.round(team.ties * 1000) / parseFloat(1000)}</td>
                     <td>${team.winPct.toFixed(3)}</td>
+                    <td>${team.adjWinPct.toFixed(3)}</td>
                     <td>${team.sos.toFixed(3)}</td>
                 </tr>`
     });
@@ -182,8 +344,11 @@ function processData(rawData) {
     return;
 }
 
-function loadFile() {      
+function loadFile() {
     var file = document.getElementById('uploadButton').files[0];
+    var numCycles = document.getElementById('numCycles').value;
+    var nullGames = document.getElementById('nullGames').value;
+    var useNullOpp = document.getElementById('nullOpp').checked;
     var extension = file.name.split('.').pop();
     console.log(extension);
     let url = window.URL.createObjectURL(file);
@@ -197,7 +362,7 @@ function loadFile() {
             }
             else {
                 URL.revokeObjectURL(url);
-                processData(data);
+                processData(data, numCycles, nullGames, useNullOpp);
             }
         })
     }
@@ -210,7 +375,7 @@ function loadFile() {
             }
             else {
                 URL.revokeObjectURL(url);
-                processData(data);
+                processData(data, numCycles, nullGames, useNullOpp);
             }
         })
     }
@@ -221,5 +386,4 @@ function loadFile() {
 
     URL.revokeObjectURL(url);
 
-    
 }

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log5 Machine</title>
+	<link rel="stylesheet" href="Shared/CSS/navbar.css"></link>
+	<link rel="stylesheet" href="Log5Machine/CSS/style.css"></link>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="Log5Machine/Scripts/calculate.js"></script>
+</head>
+<body>
+	<div id="navbar"></div>
+	<script src="Shared/Scripts/navbar.js"></script>
+	<div id="container">
+		<div id="pageHdr">Log5 Machine</div>
+		<div id="inputContainer">
+			<label for="numCycles">Number of cycles:</label>
+			<input type="number" id="numCycles" name="numCycles" min="1" max="1000" step="1" value="1000">
+		</div>
+		<div id="inputContainer2">
+			<label for="nullGames">Number of null games per team:</label>
+			<input type="number" id="nullGames" name="nullGames" min="0" step="0.01" value="0">
+		</div>
+		<div id="inputContainer3">
+			<label for="nullOpp">Use null opponent model:</label>
+			<input type="checkbox" id="nullOpp" name="nullOpp" value="nullOpp">
+		</div>
+		<div id="buttonContainer">
+			<input type="file" id="uploadButton" accept=".csv,.tsv" onchange="loadFile()" />
+		</div>
+		<div id="result"></div>
+	</div>
+</body>
